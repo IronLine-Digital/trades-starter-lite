@@ -1,0 +1,26 @@
+{
+  "name": "trades-starter-lite",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Free Next.js + Sanity starter for trades and contractor businesses. The lite foundation of the IronLine Trades Starter Kit.",
+  "license": "MIT",
+  "workspaces": [
+    "frontend",
+    "studio"
+  ],
+  "scripts": {
+    "dev": "concurrently -n studio,frontend -c blue,green \"npm run dev:studio\" \"npm run dev:frontend\"",
+    "dev:frontend": "npm --workspace frontend run dev",
+    "dev:studio": "npm --workspace studio run dev",
+    "build": "npm --workspace frontend run build",
+    "build:studio": "npm --workspace studio run build",
+    "deploy:studio": "npm --workspace studio run deploy",
+    "seed": "npm --workspace studio run seed",
+    "lint": "npm --workspace frontend run lint",
+    "validate": "sanity-template-validate"
+  },
+  "devDependencies": {
+    "@sanity/template-validator": "^2",
+    "concurrently": "^9.2.1"
+  }
+}
