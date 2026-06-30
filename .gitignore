@@ -33,3 +33,8 @@ yarn-error.log*
 .vercel
 *.tsbuildinfo
 next-env.d.ts
+
+# internal build/planning docs — not part of the template
+PLAN.md
+pass*-plan.md
+HANDOFF.md
