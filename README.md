@@ -2,9 +2,9 @@
 
 **A free Next.js + Sanity starter for trades and contractor businesses** — electricians, plumbers, HVAC, roofers, landscapers, painters. Services, projects, careers, and a working contact form, content-managed in Sanity and deployable to Vercel.
 
-This is the **lite** foundation of the [IronLine Trades Starter Kit](https://ironlinedigital.com/trades-starter). It ships seeded with a fictional electrician (Brightwork Electric) so the site looks real the moment you run it.
+**▶ [Live demo](https://trades-starter-lite-demo.vercel.app)** — the template running as shipped, with the demo content seeded.
 
-<!-- Add screenshots to docs/ and reference them here, e.g. ![Home](docs/screenshot-home.png) -->
+This is the **lite** foundation of the [IronLine Trades Starter Kit](https://ironlinedigital.com/trades-starter). It ships seeded with a fictional electrician (Brightwork Electric) so the site looks real the moment you run it.
 
 ## What's included
 
