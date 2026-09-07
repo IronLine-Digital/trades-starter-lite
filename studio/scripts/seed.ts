@@ -1,11 +1,20 @@
 /**
  * Seed the dataset with a fictional electrician ("Brightwork Electric") so a
- * fresh clone shows a populated site. Re-runnable: every doc uses a fixed _id
- * and createOrReplace, so running it again resets the demo content.
+ * fresh clone shows a populated site.
  *
  *   npm run seed          # after `sanity login`
  *   # or headless/CI:
  *   SANITY_AUTH_TOKEN=<editor-token> npx sanity exec scripts/seed.ts --with-user-token
+ *
+ * ⚠ THIS IS DESTRUCTIVE. Every document uses a fixed _id and createOrReplace,
+ * so a second run overwrites whatever now lives at those ids — including the
+ * `businessInfo` singleton that holds your business name, phone, address and
+ * license number. It is meant for a FRESH, EMPTY dataset only.
+ *
+ * To make that safe, the script refuses to run when the target dataset already
+ * looks like a real site: documents it did not create, saved form submissions,
+ * or a businessInfo whose name is no longer the demo value. Override with
+ * `SEED_FORCE=1` only when you genuinely want the demo content back.
  *
  * Images are uploaded best-effort from picsum.photos; if a download fails the
  * document is still created (just without that image).
@@ -13,6 +22,92 @@
 import {getCliClient} from 'sanity/cli'
 
 const client = getCliClient({apiVersion: '2026-02-01'})
+
+/** The only ids this script owns. Anything else in the dataset is the user's. */
+const SEED_IDS = [
+  'businessInfo',
+  'service-panel-upgrades',
+  'service-ev-chargers',
+  'service-lighting',
+  'service-emergency-repairs',
+  'project-service-upgrade',
+  'project-recessed-lighting',
+  'project-tenant-fitup',
+  'job-licensed-electrician',
+  'job-apprentice-electrician',
+]
+
+/** Content types this script writes — the ones a re-run would clobber. */
+const MANAGED_TYPES = ['businessInfo', 'service', 'project', 'jobPosting']
+
+/** Not overwritten, but their presence means the site is live and collecting leads. */
+const SUBMISSION_TYPES = ['contactSubmission', 'applicationSubmission']
+
+const SEED_BUSINESS_NAME = 'Brightwork Electric'
+
+const forced = process.env.SEED_FORCE === '1' || process.argv.includes('--force')
+
+/**
+ * Refuse to overwrite a dataset that already holds real content. Runs before
+ * any write — including image uploads — so a blocked run leaves no trace.
+ */
+async function assertSafeToSeed() {
+  const {projectId, dataset} = client.config()
+  console.log(`Target: project ${projectId} · dataset ${dataset}`)
+
+  const draftIds = SEED_IDS.map((id) => `drafts.${id}`)
+  const {ownContent, submissions, businessName} = await client.fetch<{
+    ownContent: number
+    submissions: number
+    businessName: string | null
+  }>(
+    `{
+      "ownContent": count(*[_type in $managed && !(_id in $seedIds) && !(_id in $draftIds)]),
+      "submissions": count(*[_type in $submissionTypes]),
+      "businessName": *[_id == "businessInfo"][0].businessName
+    }`,
+    {managed: MANAGED_TYPES, submissionTypes: SUBMISSION_TYPES, seedIds: SEED_IDS, draftIds},
+  )
+
+  const reasons: string[] = []
+  if (ownContent > 0) {
+    reasons.push(`${ownContent} document(s) this seed did not create`)
+  }
+  if (submissions > 0) {
+    reasons.push(`${submissions} saved form submission(s)`)
+  }
+  if (businessName && businessName !== SEED_BUSINESS_NAME) {
+    reasons.push(`businessInfo is "${businessName}", not the demo business`)
+  }
+
+  if (reasons.length === 0) return
+
+  if (forced) {
+    console.warn('⚠ Dataset is not empty:')
+    reasons.forEach((r) => console.warn(`    • ${r}`))
+    console.warn('⚠ Overwriting anyway because SEED_FORCE is set.\n')
+    return
+  }
+
+  console.error('\n✋ Refusing to seed — this dataset already holds real content:\n')
+  reasons.forEach((r) => console.error(`    • ${r}`))
+  console.error(
+    [
+      '',
+      `Seeding would overwrite the demo ids in project ${projectId} / dataset ${dataset},`,
+      'including the businessInfo singleton (business name, phone, address, license).',
+      '',
+      'If you meant to seed a different dataset, point the CLI at it first:',
+      '    npx sanity dataset list',
+      '    SANITY_STUDIO_DATASET=<dataset> npm run seed',
+      '',
+      'If you really do want the demo content back here, re-run with:',
+      '    SEED_FORCE=1 npm run seed',
+      '',
+    ].join('\n'),
+  )
+  process.exit(1)
+}
 
 let keyCounter = 0
 const key = () => `k${keyCounter++}`
@@ -43,6 +138,8 @@ async function uploadImage(seed: string, label: string) {
 }
 
 async function seed() {
+  await assertSafeToSeed()
+
   console.log('Uploading images (best-effort)…')
   const [
     svc1Img,
@@ -245,6 +342,13 @@ async function seed() {
       order: 1,
     },
   ]
+
+  // Keep SEED_IDS honest: an id here that the guard doesn't know about would be
+  // both unprotected on this run and misread as the user's content on the next.
+  const untracked = docs.map((d) => d._id as string).filter((id) => !SEED_IDS.includes(id))
+  if (untracked.length > 0) {
+    throw new Error(`Add these ids to SEED_IDS before seeding: ${untracked.join(', ')}`)
+  }
 
   const tx = docs.reduce((t, doc) => t.createOrReplace(doc), client.transaction())
   await tx.commit()

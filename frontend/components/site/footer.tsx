@@ -174,7 +174,8 @@ export async function Footer() {
 }
 
 function FallbackFooter({year}: {year: number}) {
-  const siteName = process.env.NEXT_PUBLIC_SITE_NAME ?? 'Trades Starter'
+  // Only reached when Sanity has no businessInfo yet. Same literal as Header/Hero.
+  const siteName = 'Trades Starter'
   return (
     <footer className="mt-24 bg-charcoal text-charcoal-foreground">
       <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-3 px-4 py-6 text-xs text-charcoal-foreground/60 sm:flex-row sm:items-center sm:px-6 lg:px-8">

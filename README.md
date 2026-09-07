@@ -54,6 +54,12 @@ You need Node 20+ and a free [Sanity account](https://sanity.io/manage).
    npx sanity login
    npm run seed
    ```
+   > **Seed once, onto an empty dataset.** The seeder writes fixed document IDs, so a
+   > re-run replaces whatever now lives at them — including the Business Info
+   > singleton holding your name, phone, address and license. It refuses to run once
+   > the dataset holds content it didn't create, saved form submissions, or a business
+   > name that is no longer the demo one. Override with `SEED_FORCE=1` only when you
+   > actually want the demo content back.
 
 Visit [http://localhost:3000](http://localhost:3000) for the site and [http://localhost:3333](http://localhost:3333) for the Studio.
 
@@ -102,7 +108,7 @@ trades-starter-lite/
 | `npm run build` | Production build of the frontend |
 | `npm run build:studio` | Build the Studio |
 | `npm run deploy:studio` | Deploy the Studio to `*.sanity.studio` |
-| `npm run seed` | Seed the demo content (run `npx sanity login` first) |
+| `npm run seed` | Seed demo content onto an empty dataset (run `npx sanity login` first) |
 | `npm run lint` | Lint the frontend |
 | `npm run validate` | Run the Sanity template validator |
 
@@ -118,10 +124,12 @@ trades-starter-lite/
 
 | Want to change | Edit |
 |---|---|
+| Business name, phone, hours, services | **Business Info in the Studio** — no code. Page titles, `<title>` tags and OG cards all read from it. |
 | Brand color | `--brand` in `frontend/app/globals.css` |
 | Fonts | `frontend/app/layout.tsx` (swap the `next/font/google` pair) |
+| Favicon | replace `frontend/app/icon.svg` |
 | Service icons | the `ICONS` map in `frontend/components/site/service-card.tsx` |
-| Demo content | `studio/scripts/seed.ts` (re-run with `npm run seed`) |
+| Demo content | `studio/scripts/seed.ts` (read the seeding note above before re-running) |
 
 ## Security & rate limiting
 
