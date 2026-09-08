@@ -128,6 +128,7 @@ trades-starter-lite/
 | Brand color | `--brand` in `frontend/app/globals.css` |
 | Fonts | `frontend/app/layout.tsx` (swap the `next/font/google` pair) |
 | Favicon | replace `frontend/app/icon.svg` |
+| Service & project photos | add a **Featured Image** in the Studio. The demo seeds no photos on purpose — service cards fall back to their icon, so you see layout rather than stock images of someone else's work. |
 | Service icons | the `ICONS` map in `frontend/components/site/service-card.tsx` |
 | Demo content | `studio/scripts/seed.ts` (read the seeding note above before re-running) |
 

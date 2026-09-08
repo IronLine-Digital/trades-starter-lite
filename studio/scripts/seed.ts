@@ -16,8 +16,10 @@
  * or a businessInfo whose name is no longer the demo value. Override with
  * `SEED_FORCE=1` only when you genuinely want the demo content back.
  *
- * Images are uploaded best-effort from picsum.photos; if a download fails the
- * document is still created (just without that image).
+ * No images. Service and project cards render without a `featuredImage` by
+ * design — services fall back to their Lucide icon — so the demo shows real
+ * layout instead of stock photos that have nothing to do with the work. Add
+ * your own in the Studio. This also keeps seeding offline-safe and instant.
  */
 import {getCliClient} from 'sanity/cli'
 
@@ -49,7 +51,7 @@ const forced = process.env.SEED_FORCE === '1' || process.argv.includes('--force'
 
 /**
  * Refuse to overwrite a dataset that already holds real content. Runs before
- * any write — including image uploads — so a blocked run leaves no trace.
+ * any write, so a blocked run leaves the dataset untouched.
  */
 async function assertSafeToSeed() {
   const {projectId, dataset} = client.config()
@@ -123,45 +125,8 @@ function blocks(...paragraphs: string[]) {
   }))
 }
 
-async function uploadImage(seed: string, label: string) {
-  const url = `https://picsum.photos/seed/${seed}/1600/1200`
-  try {
-    const res = await fetch(url)
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    const buf = Buffer.from(await res.arrayBuffer())
-    const asset = await client.assets.upload('image', buf, {filename: `${seed}.jpg`})
-    return {_type: 'image', asset: {_type: 'reference', _ref: asset._id}}
-  } catch (e) {
-    console.warn(`  ⚠ image upload failed (${label}): ${(e as Error).message}`)
-    return undefined
-  }
-}
-
 async function seed() {
   await assertSafeToSeed()
-
-  console.log('Uploading images (best-effort)…')
-  const [
-    svc1Img,
-    svc2Img,
-    svc3Img,
-    svc4Img,
-    proj1Img,
-    proj1Gal1,
-    proj1Gal2,
-    proj2Img,
-    proj3Img,
-  ] = await Promise.all([
-    uploadImage('bw-panel', 'service: panel'),
-    uploadImage('bw-ev', 'service: ev'),
-    uploadImage('bw-lighting', 'service: lighting'),
-    uploadImage('bw-repair', 'service: repair'),
-    uploadImage('bw-proj1', 'project 1'),
-    uploadImage('bw-proj1b', 'project 1 gallery a'),
-    uploadImage('bw-proj1c', 'project 1 gallery b'),
-    uploadImage('bw-proj2', 'project 2'),
-    uploadImage('bw-proj3', 'project 3'),
-  ])
 
   const docs: any[] = [
     {
@@ -207,7 +172,6 @@ async function seed() {
       category: 'Residential',
       featured: true,
       order: 0,
-      ...(svc1Img ? {featuredImage: svc1Img} : {}),
     },
     {
       _id: 'service-ev-chargers',
@@ -223,7 +187,6 @@ async function seed() {
       category: 'Residential',
       featured: true,
       order: 1,
-      ...(svc2Img ? {featuredImage: svc2Img} : {}),
     },
     {
       _id: 'service-lighting',
@@ -239,7 +202,6 @@ async function seed() {
       category: 'Residential',
       featured: false,
       order: 2,
-      ...(svc3Img ? {featuredImage: svc3Img} : {}),
     },
     {
       _id: 'service-emergency-repairs',
@@ -254,7 +216,6 @@ async function seed() {
       category: 'Repair',
       featured: true,
       order: 3,
-      ...(svc4Img ? {featuredImage: svc4Img} : {}),
     },
 
     {
@@ -269,10 +230,6 @@ async function seed() {
       description: blocks(
         'A 1970s ranch on a 100A panel kept tripping when the AC and oven ran together. We upgraded to a 200A service with a new meter base, grounding, and a labeled 40-space panel.',
       ),
-      ...(proj1Img ? {featuredImage: proj1Img} : {}),
-      gallery: [proj1Gal1, proj1Gal2]
-        .filter(Boolean)
-        .map((img) => ({...(img as object), _key: key()})),
     },
     {
       _id: 'project-recessed-lighting',
@@ -286,7 +243,6 @@ async function seed() {
       description: blocks(
         'Replaced dated can lights and added a dimmable recessed layout across the main floor, with smart switches in the kitchen and living room.',
       ),
-      ...(proj2Img ? {featuredImage: proj2Img} : {}),
     },
     {
       _id: 'project-tenant-fitup',
@@ -300,7 +256,6 @@ async function seed() {
       description: blocks(
         'Full electrical fit-up for a 3,200 sq ft retail space: new subpanel, lighting, dedicated circuits, and data rough-in, coordinated around the GC’s schedule.',
       ),
-      ...(proj3Img ? {featuredImage: proj3Img} : {}),
     },
 
     {
