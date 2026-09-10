@@ -2,7 +2,7 @@
 
 **A free Next.js + Sanity starter for trades and contractor businesses** — electricians, plumbers, HVAC, roofers, landscapers, painters. Services, projects, careers, and a working contact form, content-managed in Sanity and deployable to Vercel.
 
-**▶ [Live demo](https://trades-starter-lite-demo.vercel.app)** — the template running as shipped, with the demo content seeded.
+**▶ [Live demo](https://trades-starter-lite-demo.vercel.app)** — the template running as shipped, with the demo content seeded. Try the forms: submissions are saved to Sanity, but the demo runs without a Resend key, so no notification email is sent. Add your own key and they send.
 
 This is the **lite** foundation of the [IronLine Trades Starter Kit](https://ironlinedigital.com/trades-starter). It ships seeded with a fictional electrician (Brightwork Electric) so the site looks real the moment you run it.
 
@@ -10,7 +10,7 @@ This is the **lite** foundation of the [IronLine Trades Starter Kit](https://iro
 
 - **Sanity-managed content** — `businessInfo` (singleton), `service`, `project`, `jobPosting`, plus `contactSubmission` / `applicationSubmission` capture.
 - **5 pages** — Home (hero + services + recent projects + CTA), Services, Projects, Careers (with apply form), Contact.
-- **Working forms** — contact + job application → saved to Sanity + emailed to the owner via Resend (honeypot spam protection, graceful no-op until email is configured).
+- **Working forms** — contact + job application, validated and honeypot-protected, saved to Sanity every time, and emailed to the owner via Resend once you add a key. The save never depends on the email, so no enquiry is lost while email is still being wired up.
 - **Standalone Sanity Studio** — singleton-enforced business info, deployable to `*.sanity.studio`.
 - **Mobile-first** — sticky tap-to-call bar, Oswald/Montserrat type, brand color tokens.
 
