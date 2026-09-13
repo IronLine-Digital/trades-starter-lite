@@ -22,7 +22,8 @@ export const businessInfoQuery = defineQuery(`
     licenseNumber,
     insured,
     social,
-    logo${IMAGE}
+    logo${IMAGE},
+    heroImage${IMAGE}
   }
 `)
 

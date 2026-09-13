@@ -44,6 +44,13 @@ export default defineType({
     defineField({name: 'tagline', title: 'Tagline', type: 'string'}),
     defineField({name: 'logo', title: 'Logo', type: 'image', options: {hotspot: true}}),
     defineField({
+      name: 'heroImage',
+      title: 'Hero Image',
+      type: 'image',
+      description: 'Background photo for the homepage hero. Leave empty for a solid dark hero.',
+      options: {hotspot: true},
+    }),
+    defineField({
       name: 'tradeType',
       title: 'Trade Type',
       type: 'string',

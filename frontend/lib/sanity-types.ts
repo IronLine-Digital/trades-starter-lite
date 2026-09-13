@@ -47,6 +47,7 @@ export interface BusinessInfo {
   businessName: string
   tagline?: string
   logo?: SanityImage
+  heroImage?: SanityImage
   tradeType?: string
   phone: string
   email?: string

@@ -17,6 +17,7 @@ type SanityImageProps = {
   sizes?: string
   priority?: boolean
   fetchPriority?: 'high' | 'low' | 'auto'
+  loading?: 'eager' | 'lazy'
   quality?: number
 } & ({fill: true; width?: never; height?: never} | {fill?: false; width?: number; height?: number})
 
@@ -34,6 +35,7 @@ export function SanityImage({
   sizes,
   priority,
   fetchPriority,
+  loading,
   quality,
   fill,
   width,
@@ -62,6 +64,7 @@ export function SanityImage({
     sizes,
     priority,
     fetchPriority,
+    loading,
     quality,
     placeholder: lqip && !tooSmallForBlur ? ('blur' as const) : undefined,
     blurDataURL: lqip && !tooSmallForBlur ? lqip : undefined,
